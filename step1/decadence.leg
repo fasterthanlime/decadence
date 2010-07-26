@@ -1,0 +1,34 @@
+%{
+// This is the grammar file for decadence
+// @author Amos Wenger
+
+// Hooks, that are called when a rule is matched. To begin with,
+// we only have one.
+void gotLust();
+
+%}
+
+# Comments outside of the %{ ... %} section begin with a '#'
+
+
+# Here is our top 'rule'. If it is matched, our program is valid.
+# If not, there's a syntax error somewhere
+
+# "..." is a string literal - it must match exactly. Case-sensitive.
+# Between {}, we have an 'action'. It's basically C code, that will get
+# executed when this rule is matched.
+
+Lust = "lust" { gotLust() }
+
+%%
+
+int decadenceParse(char *path) {
+
+    GREG *G = YY_ALLOC(sizeof(GREG), 0);
+    G->buflen = 0;
+
+    while (yyparse(G)) {}
+
+    return 0;
+
+}
