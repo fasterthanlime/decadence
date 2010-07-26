@@ -1,0 +1,66 @@
+%{
+// This is the grammar file for decadence
+// @author Amos Wenger
+
+// For file I/O
+#include <stdio.h>
+
+// Store the state of the parser
+struct _ParserState {
+    /* A pointer to the instance of our Parser */
+    void *this;
+    /* The path of the file we're currently parsing */
+    char *path;
+    /* The file */
+    FILE *file;
+};
+
+// Defining YY_INPUT here 'overrides' the default one which reads
+// from stdin. Here we want to raed from a file.
+// The logic of result / etc. is taken from the default YY_INPUT
+// we mostly just changed getchar() to fget(core->file)
+#define YY_INPUT(buf, result, max_size)                 \
+  {                                                     \
+    int yyc = fgetc(core->file);                        \
+    result= (EOF == yyc) ? 0 : (*(buf)= yyc, 1);        \
+  }
+
+typedef struct _ParserState ParserState;
+
+#define YY_XTYPE ParserState *
+#define YY_XVAR core
+
+///////////////////// HOOKS ///////////////////////
+
+void gotLust(void *this);
+
+%}
+
+# we now have to pass the 'this' parameter for every hook
+Lust = "lust" { gotLust(core->this) }
+
+%%
+
+// We get the parser object as an argument, and the file we need to parse
+int decadenceParse(void *this, char *path) {
+
+    GREG *G = YY_ALLOC(sizeof(GREG), 0);
+    G->buflen = 0;
+
+    // let's initialize the state (yay C99 syntax)
+    struct _ParserState state = {
+        .this = this,
+        .path = path,
+        .file = fopen(path, "r")
+    };
+    G->data = &state;
+
+    while (yyparse(G)) {}
+
+    // let's try to care about memory/resources cleanup this time.
+    fclose(state.file);
+    YY_FREE(G);
+
+    return 0;
+
+}
