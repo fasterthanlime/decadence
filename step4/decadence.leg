@@ -2,7 +2,6 @@
 // This is the grammar file for decadence
 // @author Amos Wenger
 
-// For file I/O
 #include <stdio.h>
 
 // Store the state of the parser
@@ -15,10 +14,7 @@ struct _ParserState {
     FILE *file;
 };
 
-// Defining YY_INPUT here 'overrides' the default one which reads
-// from stdin. Here we want to read from a file.
-// The logic of result / etc. is taken from the default YY_INPUT
-// we mostly just changed getchar() to fget(core->file)
+// Read from a file
 #define YY_INPUT(buf, result, max_size)                 \
   {                                                     \
     int yyc = fgetc(core->file);                        \
@@ -33,11 +29,26 @@ typedef struct _ParserState ParserState;
 ///////////////////// HOOKS ///////////////////////
 
 void gotLust(void *this);
+// oh, hey, a new callback!
+void gotNumber(void *this, char *number);
 
 %}
 
-# we now have to pass the 'this' parameter for every hook
+# Top-level rule is now that:
+Program = Lust | Number
+
+# | = or
+# Note that the top-level might match more than once.
+
+# Same ol' lust
 Lust = "lust" { gotLust(core->this) }
+
+# And now matching numbers
+Number = < [0-9]+ > { gotNumber(core->this, yytext) }
+
+# < and > delimits the portion of the text captured into yytext
+# [] = character class. 0-9 = match any character from 0 to 9
+# + = 1 or more
 
 %%
 
@@ -47,7 +58,6 @@ int decadenceParse(void *this, char *path) {
     GREG *G = YY_ALLOC(sizeof(GREG), 0);
     G->buflen = 0;
 
-    // let's initialize the state (yay C99 syntax)
     struct _ParserState state = {
         .this = this,
         .path = path,
@@ -57,7 +67,6 @@ int decadenceParse(void *this, char *path) {
 
     while (yyparse(G)) {}
 
-    // let's try to care about memory/resources cleanup this time.
     fclose(state.file);
     YY_FREE(G);
 
