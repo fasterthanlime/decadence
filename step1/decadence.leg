@@ -22,7 +22,7 @@ Lust = "lust" { gotLust() }
 
 %%
 
-int decadenceParse(char *path) {
+int decadenceParse() {
 
     GREG *G = YY_ALLOC(sizeof(GREG), 0);
     G->buflen = 0;

@@ -1,0 +1,40 @@
+%{
+// This is the grammar file for decadence
+// @author Amos Wenger
+
+// Now every hook has a 'this' pointer
+void gotLust(void *this);
+
+// Store the state of the parser
+struct _ParserState {
+    /* A pointer to the instance of our Parser */
+    void *this;
+};
+
+typedef struct _ParserState ParserState;
+
+#define YY_XTYPE ParserState *
+#define YY_XVAR core
+
+%}
+
+# we now have to pass the 'this' parameter for every hook
+Lust = "lust" { gotLust(core->this) }
+
+%%
+
+// We get the parser object as an argument
+int decadenceParse(void *this) {
+
+    GREG *G = YY_ALLOC(sizeof(GREG), 0);
+    G->buflen = 0;
+
+    // let's initialize the state
+    struct _ParserState state = { this };
+    G->data = &state;
+
+    while (yyparse(G)) {}
+
+    return 0;
+
+}
