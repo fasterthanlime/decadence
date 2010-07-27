@@ -1,0 +1,98 @@
+%{
+// This is the grammar file for decadence
+// @author Amos Wenger
+
+#include <stdio.h>
+
+// Store the state of the parser
+struct _ParserState {
+    /* A pointer to the instance of our Parser */
+    void *this;
+    /* The path of the file we're currently parsing */
+    char *path;
+    /* The file */
+    FILE *file;
+};
+
+// Read from a file
+#define YY_INPUT(buf, result, max_size)                 \
+  {                                                     \
+    int yyc = fgetc(core->file);                        \
+    result= (EOF == yyc) ? 0 : (*(buf)= yyc, 1);        \
+  }
+
+typedef struct _ParserState ParserState;
+
+#define YY_XTYPE ParserState *
+#define YY_XVAR core
+
+// That's the type of '$$'
+#define YYSTYPE void *
+
+///////////////////// HOOKS ///////////////////////
+
+// Now gotNumber returns a Number object
+void *gotNumber(void *this, char *number);
+
+// And so does gotBinaryOp
+void *gotBinaryOp(void *this, char *type, void *left, void *right);
+
+// onExpr is just to notify the Parser so no return value
+void onExpr(void *this, void *expr);
+
+// stringClone is used because the 'yytext' buffer is overwitten with
+// new data often, so we clone what we want to keep
+char *stringClone(char *str);
+
+%}
+
+# As you notice, we can name rules, ie. here the Expr is captured as 'e'
+# And then we can use it in the actino code.
+Program = EOL? e:Expr { onExpr(core->this, e) }
+
+# Try to parse a BinaryOp first, if it fails, parse a Number.
+Expr = BinaryOp -
+
+# Numbers stay the same, except that we store them in '$$' now.
+Number = < [0-9]+ > - { $$=gotNumber(core->this, yytext) }
+
+# A BinaryOp = a Number, and then 0 or more times an operator and another BinaryOp
+BinaryOp = l:Number
+          (- o:Operator - r:Number { $$=l=gotBinaryOp(core->this, o, l, r) })*
+
+Operator = < ("+" | "*" | "/" | "-") > { $$=stringClone(yytext) }
+
+# ( and ) group rules
+# |  is still or
+# < and > still delimit the boundaries of the yytext capture
+
+# Whitespace
+- = [ \t]*
+
+# End-of-line
+EOL = [\n]
+
+
+%%
+
+// We get the parser object as an argument, and the file we need to parse
+int decadenceParse(void *this, char *path) {
+
+    GREG *G = YY_ALLOC(sizeof(GREG), 0);
+    G->buflen = 0;
+
+    struct _ParserState state = {
+        .this = this,
+        .path = path,
+        .file = fopen(path, "r")
+    };
+    G->data = &state;
+
+    while (yyparse(G)) {}
+
+    fclose(state.file);
+    YY_FREE(G);
+
+    return 0;
+
+}
