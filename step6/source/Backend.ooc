@@ -1,4 +1,5 @@
 
+import os/Process
 import io/[File, FileWriter]
 import ast/[Node, Expr, Number, BinaryOp, Program, Visitor]
 
@@ -13,8 +14,7 @@ Backend: class implements Visitor {
     init: func (=program) {}
 
     generate: func {
-        name := File new(program path) name()
-        name = name substring(0, name lastIndexOf('.'))
+        name := program path substring(0, program path lastIndexOf('.'))
 
         fw = FileWriter new(name + ".c")
         fw write("#include <stdio.h>\n\nint main(int argc, char **argv) {\n\n")
@@ -26,6 +26,16 @@ Backend: class implements Visitor {
         }
 
         fw write("\n}\n\n")
+        fw close()
+
+        "Generated C sources, now compiling." println()
+        (output, exitCode) := Process new(["gcc", "-o", name, name + ".c"]) getOutput()
+        output print()
+        if(exitCode == 0) {
+            "Done!" println()
+        } else {
+            "Failed :(\nKeeping %s around for inspection." printfln(name + ".c")
+        }
     }
 
     visitNumber: func (n: Number) {

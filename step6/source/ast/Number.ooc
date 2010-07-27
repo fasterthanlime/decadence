@@ -8,9 +8,7 @@ Number: class extends Expr {
 
     value: LLong
 
-    init: func (=value) {
-        "[%s] %s" printfln(class name, toString())
-    }
+    init: func (=value) {}
 
     toString: func -> String {
         value toString()

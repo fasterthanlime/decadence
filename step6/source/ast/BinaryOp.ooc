@@ -9,9 +9,7 @@ BinaryOp: class extends Expr {
     type: String
     left, right: Expr
 
-    init: func (=type, =left, =right) {
-        "[%s] %s" printfln(class name, toString())
-    }
+    init: func (=type, =left, =right) {}
 
     toString: func -> String {
         "%s %s %s" format(left toString(), type, right toString())

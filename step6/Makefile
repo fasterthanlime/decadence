@@ -3,7 +3,7 @@
 all:
 	mkdir -p generated
 	greg decadence.leg > generated/parser.c
-	rock decadence.ooc generated/parser.c -outpath=generated -v -g -nolines
+	rock -sourcepath=source decadence.ooc generated/parser.c -outpath=generated -v -g -nolines
 
 test:
 	./decadence tests/number.dec
