@@ -1,0 +1,12 @@
+
+a = 1
+b = 2
+c = 3
+
+a = a + b + c
+b = a + b + c
+c = a + b + c
+
+a
+b
+c
