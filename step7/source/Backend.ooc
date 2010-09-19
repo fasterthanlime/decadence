@@ -11,13 +11,12 @@ Backend: class implements Visitor {
 
     program: Program
     fw: FileWriter
-
     definedVariables := ArrayList<String> new()
 
     init: func (=program) {}
 
     generate: func {
-        name := program path substring(0, program path lastIndexOf('.'))
+        name := program path  substring(0, program path lastIndexOf('.'))
 
         fw = FileWriter new(name + ".c")
         fw write("#include <stdio.h>\n\nint main(int argc, char **argv) {\n\n")
@@ -41,7 +40,7 @@ Backend: class implements Visitor {
         (output, exitCode) := Process new(["gcc", "-o", name, name + ".c"]) getOutput()
         output print()
         if(exitCode == 0) {
-            "Done! Executable is in %s. Have fun!" printfln(name)
+            ("Done! Executable is in "+name+" Have fun!") println()
         } else {
             "Failed :(\nKeeping %s around for inspection." printfln(name + ".c")
         }
@@ -61,12 +60,12 @@ Backend: class implements Visitor {
     }
 
     visitNumber: func (n: Number) {
-        fw writef("%Ld", n value)
+        fw write(n value toString())
     }
 
     visitBinaryOp: func (b: BinaryOp) {
         b left accept(this)
-        fw writef(" %s ", b type)
+        fw write(b type)
         b right accept(this)
     }
 

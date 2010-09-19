@@ -14,23 +14,23 @@ Parser: class {
     }
 
     parse: func {
-        decadenceParse(this, path)
+        decadenceParse(this, path toCString())
     }
 
-    gotNumber: unmangled func (number: String) -> Number {
-        Number new(number toLLong())
+    gotNumber: unmangled func (number: CString) -> Number {
+        Number new(number toString() toLLong())
     }
 
-    gotBinaryOp: unmangled func (type: String, left, right: Expr) -> BinaryOp {
-        BinaryOp new(type clone(), left, right)
+    gotBinaryOp: unmangled func (type: CString, left, right: Expr) -> BinaryOp {
+        BinaryOp new(type toString() clone(), left, right)
     }
 
-    gotAssignment: unmangled func (left: String, right: Expr) -> Assignment {
-        Assignment new(left clone(), right)
+    gotAssignment: unmangled func (left: CString, right: Expr) -> Assignment {
+        Assignment new(left toString() clone(), right)
     }
 
-    gotVariableAccess: unmangled func (name: String) -> VariableAccess {
-        VariableAccess new(name clone())
+    gotVariableAccess: unmangled func (name: CString) -> VariableAccess {
+        VariableAccess new(name toString() clone())
     }
 
     onExpr: unmangled func (n: Node) {
@@ -39,7 +39,7 @@ Parser: class {
 
 }
 
-stringClone: unmangled func (s: String) -> String { s clone() }
+stringClone: unmangled func (s: CString) -> CString { s clone() }
 
 // decadenceParser's prototype
-decadenceParse: extern proto func (this: Parser, path: String)
+decadenceParse: extern proto func (this: Parser, path: CString)
