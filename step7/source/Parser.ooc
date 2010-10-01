@@ -26,7 +26,7 @@ Parser: class {
     }
 
     gotAssignment: unmangled func (left: CString, right: Expr) -> Assignment {
-        Assignment new(left toString() clone(), right)
+        Assignment new(left clone() toString(), right)
     }
 
     gotVariableAccess: unmangled func (name: CString) -> VariableAccess {

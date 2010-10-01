@@ -17,12 +17,12 @@ Parser: class {
         decadenceParse(this, path)
     }
 
-    gotNumber: unmangled func (number: String) -> Number {
-        Number new(number toLLong())
+    gotNumber: unmangled func (number: CString) -> Number {
+        Number new(number toString() toLLong())
     }
 
-    gotBinaryOp: unmangled func (type: String, left, right: Expr) -> BinaryOp {
-        BinaryOp new(type clone(), left, right)
+    gotBinaryOp: unmangled func (type: CString, left, right: Expr) -> BinaryOp {
+        BinaryOp new(type clone() toString(), left, right)
     }
 
     onExpr: unmangled func (e: Expr) {
@@ -31,7 +31,7 @@ Parser: class {
 
 }
 
-stringClone: unmangled func (s: String) -> String { s clone() }
+stringClone: unmangled func (s: CString) -> CString { s clone() }
 
 // decadenceParser's prototype
-decadenceParse: extern proto func (this: Parser, path: String)
+decadenceParse: extern proto func (this: Parser, path: CString)

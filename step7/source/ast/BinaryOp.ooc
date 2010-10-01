@@ -12,7 +12,7 @@ BinaryOp: class extends Expr {
     init: func (=type, =left, =right) {}
 
     toString: func -> String {
-        "%s %s %s" format(left toString(), type, right toString())
+        "%s %s %s" format(left toString() toCString(), type toCString(), right toString() toCString())
     }
 
     accept: func (v: Visitor) {

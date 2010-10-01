@@ -4,11 +4,11 @@ import structs/ArrayList
 
 // decadenceParser now takes the Parser instance as an argument
 // and now also the path of the file to parse.
-decadenceParse: extern proto func (this: Parser, path: String)
+decadenceParse: extern proto func (this: Parser, path: CString)
 
 main: func (args: ArrayList<String>) -> Int {
 
-    if(args size() < 2) {
+    if(args size < 2) {
         "Syntax: %s FILE" printfln(args[0])
         return 1
     }

@@ -32,9 +32,9 @@ Backend: class implements Visitor {
         (output, exitCode) := Process new(["gcc", "-o", name, name + ".c"]) getOutput()
         output print()
         if(exitCode == 0) {
-            "Done! Executable is in %s. Have fun!" printfln(name)
+            "Done! Executable is in %s. Have fun!" printfln(name toCString())
         } else {
-            "Failed :(\nKeeping %s around for inspection." printfln(name + ".c")
+            "Failed :(\nKeeping %s around for inspection." printfln((name + ".c") toCString())
         }
     }
 
@@ -44,7 +44,7 @@ Backend: class implements Visitor {
 
     visitBinaryOp: func (b: BinaryOp) {
         b left accept(this)
-        fw writef(" %s ", b type)
+        fw writef(" %s ", b type toCString())
         b right accept(this)
     }
 
